@@ -1,0 +1,13 @@
+# Code Owners
+# Global owners
+* @Astraeus
+
+# Frontend
+/public-site/ @Astraeus
+/admin-frontend/ @Astraeus
+
+# Backend
+/server/ @Astraeus
+
+# Deploy
+/deploy/ @Astraeus
