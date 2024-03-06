@@ -8,3 +8,7 @@ dist/
 !*.env.example
 configs/*.local.env
 .DS_Store
+*.zip
+
+# Local keys, hosts, and SSH client state must never be part of this project.
+.ssh/
