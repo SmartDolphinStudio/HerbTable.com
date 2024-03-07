@@ -9,3 +9,17 @@ Status
 This repository is under active development. The web applications currently use
 local presentation data in several views; production integrations should be
 implemented against the documented API before release.
+
+
+## Architecture
+
+- **Public site**: React, TypeScript, Vite, and Tailwind CSS.
+- **Admin console**: React, TypeScript, Vite, and Tailwind CSS.
+- **Application API**: Go HTTP service backed by MySQL and Redis.
+- **Security service**: Rust/Axum service for password hashing, token handling,
+  and authenticated encryption.
+- **Captcha service**: Go HTTP service for behavioral captcha validation.
+- **Edge**: Nginx serves static assets and proxies the public API.
+
+For service boundaries and operational assumptions, see
+[the architecture document](docs/ARCHITECTURE.md).
