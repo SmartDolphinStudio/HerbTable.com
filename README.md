@@ -23,3 +23,17 @@ implemented against the documented API before release.
 
 For service boundaries and operational assumptions, see
 [the architecture document](docs/ARCHITECTURE.md).
+
+
+## Repository Layout
+
+```text
+cmd/api-server/        Go application API entry point
+server/security/       Rust security service
+server/captcha/        Go captcha service
+web/public/            Public React application
+web/admin/             Administration React application
+configs/               Safe configuration templates
+deployments/           Nginx and systemd deployment manifests
+docs/                  Technical documentation
+```
