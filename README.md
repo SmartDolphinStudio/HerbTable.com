@@ -4,12 +4,11 @@ HerbTable is a creative curation platform with a public web experience, an
 administration console, and small native services for application and security
 workloads.
 
-Status
+## Status
 
 This repository is under active development. The web applications currently use
 local presentation data in several views; production integrations should be
 implemented against the documented API before release.
-
 
 ## Architecture
 
@@ -24,7 +23,6 @@ implemented against the documented API before release.
 For service boundaries and operational assumptions, see
 [the architecture document](docs/ARCHITECTURE.md).
 
-
 ## Repository Layout
 
 ```text
@@ -38,14 +36,12 @@ deployments/           Nginx and systemd deployment manifests
 docs/                  Technical documentation
 ```
 
-
 ## Prerequisites
 
 - Node.js 20 or later
 - Go 1.22 or later
 - Rust stable toolchain
 - MySQL and Redis for the application API
-
 
 ## Local Development
 
@@ -81,7 +77,6 @@ cargo run --manifest-path server/security/Cargo.toml
 The application API listens on `:9002` by default. The security service binds
 to `127.0.0.1:9001` by default, and the captcha service listens on `:3001`.
 
-
 ## Build Verification
 
 ```sh
@@ -91,3 +86,18 @@ to `127.0.0.1:9001` by default, and the captcha service listens on `:3001`.
 cargo check --manifest-path server/security/Cargo.toml
 (cd server/captcha && go test ./...)
 ```
+
+## Configuration and Security
+
+Never commit credentials, private keys, host files, generated archives, or
+environment-specific configuration. The repository ignores `.ssh/`, local
+environment files, build output, databases, and ZIP archives. Report security
+issues according to [SECURITY.md](SECURITY.md).
+
+## Contributing
+
+Read [CONTRIBUTING.md](CONTRIBUTING.md) before opening a pull request.
+
+## License
+
+Distributed under the [MIT License](LICENSE).
