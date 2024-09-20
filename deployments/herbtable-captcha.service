@@ -1,0 +1,16 @@
+[Unit]
+Description=HerbTable Captcha Service
+After=network.target
+
+[Service]
+Type=simple
+User=ubuntu
+Group=ubuntu
+WorkingDirectory=/opt/herbtable/server-captcha
+EnvironmentFile=/opt/herbtable/captcha.env
+ExecStart=/opt/herbtable/server-captcha/captcha
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

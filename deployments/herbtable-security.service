@@ -1,0 +1,16 @@
+[Unit]
+Description=HerbTable Rust Security Service
+After=network.target
+
+[Service]
+Type=simple
+User=ubuntu
+Group=ubuntu
+WorkingDirectory=/opt/herbtable/server-security
+EnvironmentFile=/opt/herbtable/security.env
+ExecStart=/opt/herbtable/server-security/target/release/herbtable-security
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
