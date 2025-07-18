@@ -23,5 +23,14 @@
     "ctaExploreAi": "Explore AI",
     "ctaExploreAiDesc": "Discover endless creativity with AI.",
     "ctaStart": "Let's Start"
+  },
+  "stats": {
+    "engineeringStats": "ENGINEERING_STATS",
+    "assets": "ASSETS",
+    "latencyCore": "LATENCY_CORE",
+    "uptimeRelay": "UPTIME_RELAY",
+    "systemAuth": "SYSTEM_AUTH",
+    "activeCurators": "ACTIVE_CURATORS",
+    "encryptedSsl": "ENCRYPTED_SSL_ACTIVE"
   }
 }
