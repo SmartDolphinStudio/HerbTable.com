@@ -4,5 +4,24 @@
     "explore": "explore",
     "pricing": "pricing",
     "contact": "contact"
+  },
+  "hero": {
+    "tag": "Precision Curation",
+    "title": "Share Beauty,",
+    "titleLine2": "Start Here",
+    "subtitle": "Experience a curated sanctuary for visual excellence. HerbTable is an engineered environment where high-fidelity art meets technical mastery.",
+    "ctaExplore": "Explore AI",
+    "ctaDocs": "Let's Start"
+  },
+  "gallery": {
+    "sectionLabel": "01 // Gallery",
+    "title": "Share Beauty",
+    "description": "A global collective of visionaries pushing the boundaries of digital and physical aesthetics.",
+    "curatedDaily": "CURATED DAILY",
+    "curatedDesc": "Fresh inspiration every 24 hours.",
+    "joinCollective": "JOIN COLLECTIVE",
+    "ctaExploreAi": "Explore AI",
+    "ctaExploreAiDesc": "Discover endless creativity with AI.",
+    "ctaStart": "Let's Start"
   }
 }
