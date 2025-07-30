@@ -32,5 +32,154 @@
     "systemAuth": "SYSTEM_AUTH",
     "activeCurators": "ACTIVE_CURATORS",
     "encryptedSsl": "ENCRYPTED_SSL_ACTIVE"
+  },
+  "footer": {
+    "copyright": "© 2024 HERBTABLE. PRECISION CURATION.",
+    "privacy": "PRIVACY",
+    "terms": "TERMS",
+    "api": "API"
+  },
+  "pricing": {
+    "title": "Pricing",
+    "subtitle": "Choose the plan that fits your creative needs.",
+    "personalTab": "Personal",
+    "enterpriseTab": "Enterprise",
+    "free": {
+      "name": "First Light",
+      "price": "$0",
+      "period": "/month",
+      "description": "Perfect for getting started",
+      "features": [
+        "10 uploads per month",
+        "Basic gallery view",
+        "Community support",
+        "Standard resolution"
+      ]
+    },
+    "starter": {
+      "name": "Dawn",
+      "price": "$9",
+      "period": "/month",
+      "description": "Perfect for first try",
+      "features": [
+        "Standard AI model",
+        "50 downloads/month",
+        "5 enterprise-licensed images",
+        "Email support",
+        "Standard resolution"
+      ]
+    },
+    "creator": {
+      "name": "Horizon",
+      "price": "$19",
+      "period": "/month",
+      "description": "For independent creators",
+      "features": [
+        "Advanced AI model",
+        "200 downloads/month",
+        "20 enterprise-licensed images",
+        "Priority email support",
+        "HD resolution"
+      ]
+    },
+    "pro": {
+      "name": "Solstice",
+      "price": "$39",
+      "period": "/month",
+      "description": "For serious creators",
+      "features": [
+        "Elite AI model",
+        "500 downloads/month",
+        "50 enterprise-licensed images",
+        "Priority chat support",
+        "4K resolution",
+        "API access"
+      ]
+    },
+    "business": {
+      "name": "Constellation",
+      "price": "$99",
+      "period": "/month",
+      "description": "For small teams",
+      "features": [
+        "All AI models",
+        "2000 downloads/month",
+        "200 enterprise-licensed images",
+        "Dedicated support",
+        "Team collaboration",
+        "Analytics dashboard"
+      ]
+    },
+    "team": {
+      "name": "Harbor",
+      "price": "$49",
+      "period": "/month",
+      "description": "For small teams",
+      "features": [
+        "5 seats",
+        "All AI models",
+        "1000 downloads/month",
+        "100 enterprise-licensed images",
+        "Shared asset library"
+      ]
+    },
+    "enterprise": {
+      "name": "Atlas",
+      "price": "$199",
+      "period": "/month",
+      "description": "For mid-size companies",
+      "features": [
+        "20 seats",
+        "SSO authentication",
+        "5000 downloads/month",
+        "500 enterprise-licensed images",
+        "Dedicated support",
+        "Audit logs"
+      ]
+    },
+    "platform": {
+      "name": "Meridian",
+      "price": "$499",
+      "period": "/month",
+      "description": "For platform businesses",
+      "features": [
+        "100 seats",
+        "White-label API",
+        "Unlimited downloads",
+        "2000 enterprise-licensed images",
+        "Account manager",
+        "SLA guarantee"
+      ]
+    },
+    "global": {
+      "name": "Aurora",
+      "price": "$999",
+      "period": "/month",
+      "description": "For global organizations",
+      "features": [
+        "Unlimited seats",
+        "Multi-region deployment",
+        "Custom models",
+        "Unlimited enterprise licenses",
+        "24/7 hotline support",
+        "Latest news subscription"
+      ]
+    },
+    "cta": "Get Started"
+  },
+  "contact": {
+    "title": "Contact Us",
+    "subtitle": "Have questions? We'd love to hear from you.",
+    "form": {
+      "name": "Your Name",
+      "email": "Email Address",
+      "subject": "Subject",
+      "message": "Message",
+      "send": "Send Message"
+    },
+    "info": {
+      "email": "hello@herbtable.com",
+      "location": "Singapore"
+    }
   }
 }
