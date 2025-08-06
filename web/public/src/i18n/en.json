@@ -45,125 +45,67 @@
     "personalTab": "Personal",
     "enterpriseTab": "Enterprise",
     "free": {
-      "name": "First Light",
+        "name": "First Light",
       "price": "$0",
       "period": "/month",
       "description": "Perfect for getting started",
-      "features": [
-        "10 uploads per month",
-        "Basic gallery view",
-        "Community support",
-        "Standard resolution"
-      ]
+      "features": ["10 uploads per month", "Basic gallery view", "Community support", "Standard resolution"]
     },
     "starter": {
-      "name": "Dawn",
+        "name": "Dawn",
       "price": "$9",
       "period": "/month",
       "description": "Perfect for first try",
-      "features": [
-        "Standard AI model",
-        "50 downloads/month",
-        "5 enterprise-licensed images",
-        "Email support",
-        "Standard resolution"
-      ]
+      "features": ["Standard AI model", "50 downloads/month", "5 enterprise-licensed images", "Email support", "Standard resolution"]
     },
     "creator": {
-      "name": "Horizon",
+        "name": "Horizon",
       "price": "$19",
       "period": "/month",
       "description": "For independent creators",
-      "features": [
-        "Advanced AI model",
-        "200 downloads/month",
-        "20 enterprise-licensed images",
-        "Priority email support",
-        "HD resolution"
-      ]
+      "features": ["Advanced AI model", "200 downloads/month", "20 enterprise-licensed images", "Priority email support", "HD resolution"]
     },
     "pro": {
-      "name": "Solstice",
+        "name": "Solstice",
       "price": "$39",
       "period": "/month",
       "description": "For serious creators",
-      "features": [
-        "Elite AI model",
-        "500 downloads/month",
-        "50 enterprise-licensed images",
-        "Priority chat support",
-        "4K resolution",
-        "API access"
-      ]
+      "features": ["Elite AI model", "500 downloads/month", "50 enterprise-licensed images", "Priority chat support", "4K resolution", "API access"]
     },
     "business": {
-      "name": "Constellation",
+        "name": "Constellation",
       "price": "$99",
       "period": "/month",
       "description": "For small teams",
-      "features": [
-        "All AI models",
-        "2000 downloads/month",
-        "200 enterprise-licensed images",
-        "Dedicated support",
-        "Team collaboration",
-        "Analytics dashboard"
-      ]
+      "features": ["All AI models", "2000 downloads/month", "200 enterprise-licensed images", "Dedicated support", "Team collaboration", "Analytics dashboard"]
     },
     "team": {
-      "name": "Harbor",
+        "name": "Harbor",
       "price": "$49",
       "period": "/month",
       "description": "For small teams",
-      "features": [
-        "5 seats",
-        "All AI models",
-        "1000 downloads/month",
-        "100 enterprise-licensed images",
-        "Shared asset library"
-      ]
+      "features": ["5 seats", "All AI models", "1000 downloads/month", "100 enterprise-licensed images", "Shared asset library"]
     },
     "enterprise": {
-      "name": "Atlas",
+        "name": "Atlas",
       "price": "$199",
       "period": "/month",
       "description": "For mid-size companies",
-      "features": [
-        "20 seats",
-        "SSO authentication",
-        "5000 downloads/month",
-        "500 enterprise-licensed images",
-        "Dedicated support",
-        "Audit logs"
-      ]
+      "features": ["20 seats", "SSO authentication", "5000 downloads/month", "500 enterprise-licensed images", "Dedicated support", "Audit logs"]
     },
     "platform": {
-      "name": "Meridian",
+        "name": "Meridian",
       "price": "$499",
       "period": "/month",
       "description": "For platform businesses",
-      "features": [
-        "100 seats",
-        "White-label API",
-        "Unlimited downloads",
-        "2000 enterprise-licensed images",
-        "Account manager",
-        "SLA guarantee"
-      ]
+      "features": ["100 seats", "White-label API", "Unlimited downloads", "2000 enterprise-licensed images", "Account manager", "SLA guarantee"]
     },
     "global": {
-      "name": "Aurora",
+        "name": "Aurora",
       "price": "$999",
       "period": "/month",
       "description": "For global organizations",
-      "features": [
-        "Unlimited seats",
-        "Multi-region deployment",
-        "Custom models",
-        "Unlimited enterprise licenses",
-        "24/7 hotline support",
-        "Latest news subscription"
-      ]
+      "features": ["Unlimited seats", "Multi-region deployment", "Custom models", "Unlimited enterprise licenses", "24/7 hotline support", "Latest news subscription"]
     },
     "cta": "Get Started"
   },
@@ -207,5 +149,51 @@
     "decline": "Decline",
     "policy": "Cookie Policy",
     "policyContent": "This website uses cookies to ensure you get the best experience. Essential cookies are required for core functionality such as language preferences and authentication sessions. Analytical cookies help us understand how visitors interact with the website. You can change your preferences at any time. By continuing to use this site, you consent to our use of cookies."
+  },
+  "profile": {
+    "tabs": {
+      "feed": "My Feed",
+      "works": "Works",
+      "liked": "Liked",
+      "collections": "Collections",
+      "cardPack": "Card Pack",
+      "settings": "Settings",
+      "support": "Contact Admin",
+      "basic": "Basic Settings"
+    },
+    "verifiedCurator": "Verified Curator",
+    "followers": "Followers",
+    "following": "Following",
+    "likes": "Likes",
+    "likesReceived": "Lights",
+    "uploadNewWork": "Upload New Work",
+    "bioPlaceholder": "Creative contributor on HerbTable.",
+    "searchPlaceholder": "Search their works...",
+    "noWorks": "No works found.",
+    "profileConfiguration": "Profile Configuration",
+    "displayName": "Display Name",
+    "emailAddress": "Email Address",
+    "biography": "Biography",
+    "security": "Security",
+    "password": "Password",
+    "passwordLastChanged": "Last changed 4 months ago",
+    "twoFactorAuthentication": "Two-Factor Authentication",
+    "twoFactorStatus": "Active on mobile device (iPhone 15)",
+    "update": "Update",
+    "manage": "Manage",
+    "saveChanges": "Save Changes",
+    "directChannel": "Direct Channel",
+    "directChannelDescription": "Our senior administration team is available for curation inquiries, technical issues, or partnership proposals.",
+    "avgResponseTime": "Avg. Response Time",
+    "under2Hours": "Under 2 hours",
+    "encryption": "Encryption",
+    "endToEnd256": "End-to-end 256-bit",
+    "inquiryType": "Inquiry Type",
+    "messageBody": "Message Body",
+    "sendTransmission": "Send Transmission",
+    "basicSettings": "Basic Settings",
+    "language": "Language",
+    "switchLanguage": "Switch to Chinese",
+    "currentLanguage": "English"
   }
 }
