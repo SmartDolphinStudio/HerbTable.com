@@ -181,5 +181,31 @@
       "email": "hello@herbtable.com",
       "location": "Singapore"
     }
+  },
+  "explore": {
+    "categories": {
+      "all": "ALL",
+      "photography": "PHOTOGRAPHY",
+      "digitalArt": "DIGITAL ART",
+      "minimalist": "MINIMALIST",
+      "portraits": "PORTRAITS"
+    },
+    "galleryLabel": "GALLERY",
+    "categoryBy": "CATEGORY:",
+    "sortBy": "SORT BY:",
+    "sortOptions": {
+      "all": "ALL",
+      "popularity": "POPULARITY",
+      "likes": "LIKES",
+      "saves": "SAVES"
+    }
+  },
+  "cookies": {
+    "title": "We value your privacy",
+    "description": "We use cookies to remember your preferences, analyze traffic, and personalize content. Essential cookies are always active.",
+    "accept": "Accept All",
+    "decline": "Decline",
+    "policy": "Cookie Policy",
+    "policyContent": "This website uses cookies to ensure you get the best experience. Essential cookies are required for core functionality such as language preferences and authentication sessions. Analytical cookies help us understand how visitors interact with the website. You can change your preferences at any time. By continuing to use this site, you consent to our use of cookies."
   }
 }
