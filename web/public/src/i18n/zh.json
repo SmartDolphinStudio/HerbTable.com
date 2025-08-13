@@ -4,5 +4,24 @@
     "explore": "探索",
     "pricing": "定价",
     "contact": "联系客服"
+  },
+  "hero": {
+    "tag": "精准策展",
+    "title": "分享美好，",
+    "titleLine2": "从这里开始",
+    "subtitle": "体验一个为视觉卓越而打造的策展圣地。HerbTable 是一个将高保真艺术与精湛技术完美融合的工程化环境。",
+    "ctaExplore": "探索 AI",
+    "ctaDocs": "我们开始"
+  },
+  "gallery": {
+    "sectionLabel": "01 // 画廊",
+    "title": "分享美好",
+    "description": "一个由全球梦想家组成的集体，不断突破数字与实体美学的边界。",
+    "curatedDaily": "每日精选",
+    "curatedDesc": "每24小时带来新鲜灵感。",
+    "joinCollective": "加入集体",
+    "ctaExploreAi": "探索 AI",
+    "ctaExploreAiDesc": "用人工智能发现无限创意。",
+    "ctaStart": "我们开始"
   }
 }
