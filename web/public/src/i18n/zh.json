@@ -23,5 +23,14 @@
     "ctaExploreAi": "探索 AI",
     "ctaExploreAiDesc": "用人工智能发现无限创意。",
     "ctaStart": "我们开始"
+  },
+  "stats": {
+    "engineeringStats": "工程统计",
+    "assets": "素材",
+    "latencyCore": "核心延迟",
+    "uptimeRelay": "运行时间",
+    "systemAuth": "系统认证",
+    "activeCurators": "活跃策展人",
+    "encryptedSsl": "SSL加密已激活"
   }
 }
