@@ -32,5 +32,139 @@
     "systemAuth": "系统认证",
     "activeCurators": "活跃策展人",
     "encryptedSsl": "SSL加密已激活"
+  },
+  "footer": {
+    "copyright": "© 2024 HERBTABLE. 精准策展。",
+    "privacy": "隐私政策",
+    "terms": "服务条款",
+    "api": "API"
+  },
+  "pricing": {
+    "title": "定价方案",
+    "subtitle": "选择适合您创作需求的方案。",
+    "personalTab": "个人版",
+    "enterpriseTab": "企业版",
+    "free": {
+      "name": "初光",
+      "price": "¥0",
+      "period": "/月",
+      "description": "适合入门体验",
+      "features": [
+        "每月 10 次上传",
+        "基础画廊视图",
+        "社区支持",
+        "标准分辨率"
+      ]
+    },
+    "starter": {
+      "name": "拂晓",
+      "price": "$9",
+      "period": "/月",
+      "description": "适合初次尝试",
+      "features": [
+        "标准 AI 模型",
+        "每月 50 次下载",
+        "5 张企业授权图片",
+        "邮件客服支持",
+        "基础分辨率"
+      ]
+    },
+    "creator": {
+      "name": "天际",
+      "price": "$19",
+      "period": "/月",
+      "description": "适合独立创作者",
+      "features": [
+        "高级 AI 模型",
+        "每月 200 次下载",
+        "20 张企业授权图片",
+        "优先邮件客服",
+        "高清分辨率"
+      ]
+    },
+    "pro": {
+      "name": "至日",
+      "price": "$39",
+      "period": "/月",
+      "description": "适合专业创作者",
+      "features": [
+        "精英 AI 模型",
+        "每月 500 次下载",
+        "50 张企业授权图片",
+        "优先在线客服",
+        "4K 分辨率",
+        "API 访问"
+      ]
+    },
+    "business": {
+      "name": "星群",
+      "price": "$99",
+      "period": "/月",
+      "description": "适合小型团队",
+      "features": [
+        "全部 AI 模型",
+        "每月 2000 次下载",
+        "200 张企业授权图片",
+        "专属客服支持",
+        "团队协作",
+        "数据分析面板"
+      ]
+    },
+    "team": {
+      "name": "泊湾",
+      "price": "$49",
+      "period": "/月",
+      "description": "适合小团队",
+      "features": [
+        "5 个席位",
+        "全部 AI 模型",
+        "每月 1000 次下载",
+        "100 张企业授权图片",
+        "共享素材库"
+      ]
+    },
+    "enterprise": {
+      "name": "阿特拉斯",
+      "price": "$199",
+      "period": "/月",
+      "description": "适合中型企业",
+      "features": [
+        "20 个席位",
+        "SSO 认证",
+        "每月 5000 次下载",
+        "500 张企业授权图片",
+        "专属客服",
+        "审计日志"
+      ]
+    },
+    "platform": {
+      "name": "子午线",
+      "price": "$499",
+      "period": "/月",
+      "description": "适合平台型企业",
+      "features": [
+        "100 个席位",
+        "API 白标",
+        "无限下载",
+        "2000 张企业授权图片",
+        "客户经理",
+        "SLA 保障"
+      ]
+    },
+    "global": {
+      "name": "极光",
+      "price": "$999",
+      "period": "/月",
+      "description": "适合跨国组织",
+      "features": [
+        "无限席位",
+        "多区域部署",
+        "定制模型",
+        "无限企业授权",
+        "7x24 专线支持",
+        "最新资讯订阅"
+      ]
+    },
+    "cta": "立即开始"
   }
 }
