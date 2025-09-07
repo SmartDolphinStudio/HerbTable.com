@@ -181,5 +181,31 @@
       "email": "hello@herbtable.com",
       "location": "新加坡"
     }
+  },
+  "explore": {
+    "categories": {
+      "all": "全部",
+      "photography": "摄影",
+      "digitalArt": "数字艺术",
+      "minimalist": "极简主义",
+      "portraits": "人像"
+    },
+    "galleryLabel": "画廊",
+    "categoryBy": "分类：",
+    "sortBy": "排序：",
+    "sortOptions": {
+      "all": "全部",
+      "popularity": "热度",
+      "likes": "点赞",
+      "saves": "收藏"
+    }
+  },
+  "cookies": {
+    "title": "我们重视您的隐私",
+    "description": "我们使用 Cookie 来记住您的偏好、分析流量并个性化内容。必要 Cookie 始终保持启用。",
+    "accept": "全部接受",
+    "decline": "拒绝",
+    "policy": "Cookie 政策",
+    "policyContent": "本网站使用 Cookie，以确保您获得最佳体验。必要 Cookie 是语言偏好和认证会话等核心功能所必需的。分析 Cookie 帮助我们了解访客如何与网站互动。您可以随时更改偏好。继续使用本网站即表示您同意我们使用 Cookie。"
   }
 }
