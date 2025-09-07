@@ -166,5 +166,20 @@
       ]
     },
     "cta": "立即开始"
+  },
+  "contact": {
+    "title": "联系我们",
+    "subtitle": "有问题？我们很乐意倾听。",
+    "form": {
+      "name": "您的姓名",
+      "email": "电子邮箱",
+      "subject": "主题",
+      "message": "留言内容",
+      "send": "发送消息"
+    },
+    "info": {
+      "email": "hello@herbtable.com",
+      "location": "新加坡"
+    }
   }
 }
