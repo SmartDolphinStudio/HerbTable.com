@@ -45,125 +45,67 @@
     "personalTab": "个人版",
     "enterpriseTab": "企业版",
     "free": {
-      "name": "初光",
+        "name": "初光",
       "price": "¥0",
       "period": "/月",
       "description": "适合入门体验",
-      "features": [
-        "每月 10 次上传",
-        "基础画廊视图",
-        "社区支持",
-        "标准分辨率"
-      ]
+      "features": ["每月 10 次上传", "基础画廊视图", "社区支持", "标准分辨率"]
     },
     "starter": {
-      "name": "拂晓",
+        "name": "拂晓",
       "price": "$9",
       "period": "/月",
       "description": "适合初次尝试",
-      "features": [
-        "标准 AI 模型",
-        "每月 50 次下载",
-        "5 张企业授权图片",
-        "邮件客服支持",
-        "基础分辨率"
-      ]
+      "features": ["标准 AI 模型", "每月 50 次下载", "5 张企业授权图片", "邮件客服支持", "基础分辨率"]
     },
     "creator": {
-      "name": "天际",
+        "name": "天际",
       "price": "$19",
       "period": "/月",
       "description": "适合独立创作者",
-      "features": [
-        "高级 AI 模型",
-        "每月 200 次下载",
-        "20 张企业授权图片",
-        "优先邮件客服",
-        "高清分辨率"
-      ]
+      "features": ["高级 AI 模型", "每月 200 次下载", "20 张企业授权图片", "优先邮件客服", "高清分辨率"]
     },
     "pro": {
-      "name": "至日",
+        "name": "至日",
       "price": "$39",
       "period": "/月",
       "description": "适合专业创作者",
-      "features": [
-        "精英 AI 模型",
-        "每月 500 次下载",
-        "50 张企业授权图片",
-        "优先在线客服",
-        "4K 分辨率",
-        "API 访问"
-      ]
+      "features": ["精英 AI 模型", "每月 500 次下载", "50 张企业授权图片", "优先在线客服", "4K 分辨率", "API 访问"]
     },
     "business": {
-      "name": "星群",
+        "name": "星群",
       "price": "$99",
       "period": "/月",
       "description": "适合小型团队",
-      "features": [
-        "全部 AI 模型",
-        "每月 2000 次下载",
-        "200 张企业授权图片",
-        "专属客服支持",
-        "团队协作",
-        "数据分析面板"
-      ]
+      "features": ["全部 AI 模型", "每月 2000 次下载", "200 张企业授权图片", "专属客服支持", "团队协作", "数据分析面板"]
     },
     "team": {
-      "name": "泊湾",
+        "name": "泊湾",
       "price": "$49",
       "period": "/月",
       "description": "适合小团队",
-      "features": [
-        "5 个席位",
-        "全部 AI 模型",
-        "每月 1000 次下载",
-        "100 张企业授权图片",
-        "共享素材库"
-      ]
+      "features": ["5 个席位", "全部 AI 模型", "每月 1000 次下载", "100 张企业授权图片", "共享素材库"]
     },
     "enterprise": {
-      "name": "阿特拉斯",
+        "name": "阿特拉斯",
       "price": "$199",
       "period": "/月",
       "description": "适合中型企业",
-      "features": [
-        "20 个席位",
-        "SSO 认证",
-        "每月 5000 次下载",
-        "500 张企业授权图片",
-        "专属客服",
-        "审计日志"
-      ]
+      "features": ["20 个席位", "SSO 认证", "每月 5000 次下载", "500 张企业授权图片", "专属客服", "审计日志"]
     },
     "platform": {
-      "name": "子午线",
+        "name": "子午线",
       "price": "$499",
       "period": "/月",
       "description": "适合平台型企业",
-      "features": [
-        "100 个席位",
-        "API 白标",
-        "无限下载",
-        "2000 张企业授权图片",
-        "客户经理",
-        "SLA 保障"
-      ]
+      "features": ["100 个席位", "API 白标", "无限下载", "2000 张企业授权图片", "客户经理", "SLA 保障"]
     },
     "global": {
-      "name": "极光",
+        "name": "极光",
       "price": "$999",
       "period": "/月",
       "description": "适合跨国组织",
-      "features": [
-        "无限席位",
-        "多区域部署",
-        "定制模型",
-        "无限企业授权",
-        "7x24 专线支持",
-        "最新资讯订阅"
-      ]
+      "features": ["无限席位", "多区域部署", "定制模型", "无限企业授权", "7x24 专线支持", "最新资讯订阅"]
     },
     "cta": "立即开始"
   },
@@ -207,5 +149,51 @@
     "decline": "拒绝",
     "policy": "Cookie 政策",
     "policyContent": "本网站使用 Cookie，以确保您获得最佳体验。必要 Cookie 是语言偏好和认证会话等核心功能所必需的。分析 Cookie 帮助我们了解访客如何与网站互动。您可以随时更改偏好。继续使用本网站即表示您同意我们使用 Cookie。"
+  },
+  "profile": {
+    "tabs": {
+      "feed": "我的动态",
+      "works": "作品",
+      "liked": "点赞",
+      "collections": "收藏",
+      "cardPack": "卡包",
+      "settings": "设置",
+      "support": "联系管理员",
+      "basic": "基础设置"
+    },
+    "verifiedCurator": "认证策展人",
+    "followers": "粉丝",
+    "following": "关注",
+    "likes": "获赞",
+    "likesReceived": "被点亮",
+    "uploadNewWork": "上传新作品",
+    "bioPlaceholder": "HerbTable 创作者。",
+    "searchPlaceholder": "搜索他的作品...",
+    "noWorks": "没有找到作品。",
+    "profileConfiguration": "个人资料配置",
+    "displayName": "显示名称",
+    "emailAddress": "电子邮箱",
+    "biography": "个人简介",
+    "security": "安全设置",
+    "password": "密码",
+    "passwordLastChanged": "上次修改于 4 个月前",
+    "twoFactorAuthentication": "双重认证",
+    "twoFactorStatus": "已在移动设备上激活（iPhone 15）",
+    "update": "更新",
+    "manage": "管理",
+    "saveChanges": "保存更改",
+    "directChannel": "直接通道",
+    "directChannelDescription": "我们的高级管理团队随时为您解答策展咨询、技术问题或合作提案。",
+    "avgResponseTime": "平均响应时间",
+    "under2Hours": "2 小时内",
+    "encryption": "加密",
+    "endToEnd256": "端到端 256 位加密",
+    "inquiryType": "咨询类型",
+    "messageBody": "留言内容",
+    "sendTransmission": "发送消息",
+    "basicSettings": "基础设置",
+    "language": "语言",
+    "switchLanguage": "切换到英文",
+    "currentLanguage": "中文"
   }
 }
