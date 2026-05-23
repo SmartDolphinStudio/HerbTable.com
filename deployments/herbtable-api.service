@@ -1,0 +1,16 @@
+[Unit]
+Description=HerbTable Go API Server
+After=network.target herbtable-security.service mysql.service redis-server.service
+
+[Service]
+Type=simple
+User=ubuntu
+Group=ubuntu
+WorkingDirectory=/opt/herbtable/cmd-api-server
+EnvironmentFile=/opt/herbtable/api.env
+ExecStart=/opt/herbtable/cmd-api-server/api-server
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
