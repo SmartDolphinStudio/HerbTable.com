@@ -8,3 +8,6 @@
 
 # Backend
 /server/ @Astraeus
+
+# Deploy
+/deploy/ @Astraeus
