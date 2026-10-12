@@ -12,3 +12,6 @@ configs/*.local.env
 
 # Local keys, hosts, and SSH client state must never be part of this project.
 .ssh/
+
+# Incremental TypeScript compiler cache
+*.tsbuildinfo

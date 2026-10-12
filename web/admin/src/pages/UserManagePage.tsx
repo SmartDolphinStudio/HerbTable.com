@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Search, MoreVertical, Ban, CheckCircle, Trash2, Eye, Shield, User } from 'lucide-react';
+import { useState } from 'react';
+import { Search, Ban, CheckCircle, Trash2, Eye, Shield, User } from 'lucide-react';
 import type { User as UserType } from '../types';
 
 const mockUsers: UserType[] = Array.from({ length: 20 }, (_, i) => ({

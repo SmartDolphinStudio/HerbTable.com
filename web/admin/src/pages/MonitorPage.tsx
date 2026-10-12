@@ -7,9 +7,8 @@ import {
   CartesianGrid,
   Tooltip,
   ResponsiveContainer,
-  Legend,
-} from 'recharts';
-import { RefreshCw, Trash2, X, AlertCircle } from 'lucide-react';
+  } from 'recharts';
+import { X, AlertCircle } from 'lucide-react';
 
 /** Time range options */
 const TIME_RANGES = ['昨天', '今天', '最近七天', '最近30天', '全部'] as const;

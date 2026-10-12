@@ -4,7 +4,6 @@ import { t } from '../i18n'
 
 interface User {
   name?: string
-  avatar?: string
 }
 
 /** Navigation header with logo, nav links, and user avatar */
@@ -15,7 +14,12 @@ export default function Header() {
   useEffect(() => {
     try {
       const raw = localStorage.getItem('herbtable:user')
-      if (raw) setUser(JSON.parse(raw))
+      const stored: unknown = raw ? JSON.parse(raw) : null
+      if (stored && typeof stored === 'object' && 'name' in stored && typeof stored.name === 'string' && stored.name.length <= 128) {
+        setUser({ name: stored.name })
+      } else {
+        setUser(null)
+      }
     } catch {
       setUser(null)
     }
@@ -64,7 +68,7 @@ export default function Header() {
 
         {/* User Avatar → Login/Register */}
         <Link
-          to={user ? `/profile/${user.name || 'me'}` : '/login'}
+          to={user ? `/profile/${encodeURIComponent(user.name || 'me')}` : '/login'}
           className="w-8 h-8 rounded-full overflow-hidden bg-black flex items-center justify-center hover:opacity-80 transition-opacity"
           title={user ? user.name || 'Profile' : 'Login / Register'}
         >
@@ -72,7 +76,7 @@ export default function Header() {
             <img
               alt={user.name || 'User'}
               className="w-full h-full object-cover"
-              src={user.avatar || '/Image.png'}
+              src="/Image.png"
             />
           ) : (
             <span className="material-symbols-outlined text-white text-[20px]">person</span>

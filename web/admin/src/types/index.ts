@@ -76,27 +76,10 @@ export interface BackupItem {
 }
 
 export interface MetricCardData {
-  title: string;
-  value: string;
-  change: string;
-  trend: 'up' | 'down';
-  icon: string;
-  color: string;
+  id: string; label: string; value: number; unit: string; subtitle: string; color: string;
 }
-
-export interface ProcessInfo {
-  name: string;
-  cpu: number;
-  memory: number;
-  pid: number;
-  status: string;
-}
-
-export interface TrafficDataPoint {
-  time: string;
-  rx: number;
-  tx: number;
-}
+export interface ProcessInfo { name: string; usage: number; }
+export interface TrafficDataPoint { time: string; download: number; upload: number; }
 
 export interface DiskIODataPoint {
   time: string;

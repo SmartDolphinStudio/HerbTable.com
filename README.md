@@ -1,4 +1,4 @@
-﻿# HerbTable
+# HerbTable
 
 HerbTable is a creative curation platform with a public web experience, an
 administration console, and small native services for application and security
@@ -39,7 +39,7 @@ docs/                  Technical documentation
 ## Prerequisites
 
 - Node.js 20 or later
-- Go 1.22 or later
+- Go 1.26.5
 - Rust stable toolchain
 - MySQL and Redis for the application API
 

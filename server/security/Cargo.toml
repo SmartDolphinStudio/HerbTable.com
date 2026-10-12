@@ -9,9 +9,10 @@ tokio = { version = "1", features = ["full"] }
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 argon2 = { version = "0.5", features = ["std"] }
-jsonwebtoken = "9"
+jsonwebtoken = { version = "10", features = ["rust_crypto"] }
 rand = "0.8"
-ring = "0.17"
+subtle = "2"
+ring = { version = "0.17", features = ["std"] }
 base64 = "0.21"
 hex = "0.4"
 anyhow = "1"

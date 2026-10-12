@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Search, Filter, Download, AlertTriangle, Info, CheckCircle, XCircle } from 'lucide-react';
+import { useState } from 'react';
+import { Search, Download } from 'lucide-react';
 
 type LogLevel = 'INFO' | 'WARN' | 'ERROR' | 'DEBUG';
 
@@ -38,14 +38,7 @@ export default function LogPage() {
     (l.message.toLowerCase().includes(search.toLowerCase()) || l.source.toLowerCase().includes(search.toLowerCase()))
   );
 
-  const levelIcon = (level: LogLevel) => {
-    switch (level) {
-      case 'ERROR': return <XCircle className="w-4 h-4 text-red-500" />;
-      case 'WARN': return <AlertTriangle className="w-4 h-4 text-yellow-500" />;
-      case 'INFO': return <Info className="w-4 h-4 text-blue-500" />;
-      case 'DEBUG': return <CheckCircle className="w-4 h-4 text-gray-400" />;
-    }
-  };
+
 
   const levelColor = (level: LogLevel) => {
     switch (level) {

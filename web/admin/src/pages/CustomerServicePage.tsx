@@ -209,10 +209,12 @@ function ChatArea({
   user,
   messages,
   onSend,
+  onAppend,
 }: {
   user: ChatUser | null;
   messages: Message[];
   onSend: (content: string) => void;
+  onAppend: (userId: string, message: Message) => void;
 }) {
   const [inputValue, setInputValue] = useState('');
   const [showMediaUpload, setShowMediaUpload] = useState(false);
@@ -358,10 +360,7 @@ function ChatArea({
                 timestamp: new Date().toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' }),
                 imageUrl: event.target?.result as string,
               };
-              setUserMessages((prev) => ({
-                ...prev,
-                [activeUserId]: [...(prev[activeUserId] || []), newMessage],
-              }));
+              onAppend(user.id, newMessage);
             };
             reader.readAsDataURL(file);
           }
@@ -382,10 +381,7 @@ function ChatArea({
               content: `[视频] ${file.name}`,
               timestamp: new Date().toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' }),
             };
-            setUserMessages((prev) => ({
-              ...prev,
-              [activeUserId]: [...(prev[activeUserId] || []), newMessage],
-            }));
+            onAppend(user.id, newMessage);
           }
           e.target.value = '';
         }}
@@ -697,6 +693,7 @@ export function CustomerServicePage() {
           user={activeUser}
           messages={currentMessages}
           onSend={handleSend}
+          onAppend={(id, message) => setUserMessages(prev => ({ ...prev, [id]: [...(prev[id] ?? []), message] }))}
         />
 
         {/* 右侧：用户列表 */}

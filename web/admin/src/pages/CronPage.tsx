@@ -709,7 +709,7 @@ const CronPage: React.FC = () => {
   };
 
   /** 立即执行任务 */
-  const handleExecute = (taskId: string) => {
+  const handleExecute = (_taskId: string) => {
     if (window.confirm('确定要立即执行此任务吗？')) {
       alert('任务已提交执行（模拟功能）');
     }

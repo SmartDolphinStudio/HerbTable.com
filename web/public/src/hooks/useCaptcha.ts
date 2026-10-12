@@ -31,8 +31,10 @@ export function useCaptcha() {
   const [state, setState] = useState<CaptchaState>('idle')
   const [token, setToken] = useState<string | null>(null)
   const attemptsRef = useRef(0)
+  const challengeRef = useRef<Promise<string> | null>(null)
 
   const startTracking = useCallback(() => {
+    challengeRef.current = fetch('/api/captcha/challenge', { credentials: 'include' }).then(async (r) => { if (!r.ok) throw new Error('Challenge unavailable'); const body = await r.json(); return String(body.challenge || '') }).catch(() => '');
     setState('tracking')
   }, [])
 
@@ -41,18 +43,22 @@ export function useCaptcha() {
     attemptsRef.current += 1
 
     try {
+      const challenge = await challengeRef.current
+      if (!challenge) throw new Error("Start a challenge first")
       const response = await fetch(CAPTCHA_API, {
+        credentials: "include",
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           ...data,
+          challenge,
           attemptNumber: attemptsRef.current,
         }),
       })
 
       const result = await response.json()
 
-      if (result.success) {
+      if (response.ok && result.success && typeof result.token === "string") {
         setState('verified')
         setToken(result.token)
         return { success: true, token: result.token }
@@ -69,6 +75,7 @@ export function useCaptcha() {
   const reset = useCallback(() => {
     setState('idle')
     setToken(null)
+    challengeRef.current = null
     attemptsRef.current = 0
   }, [])
 

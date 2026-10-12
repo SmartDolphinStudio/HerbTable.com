@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Folder, FileText, Image, Film, Music, Archive, ChevronRight, Search, Grid, List } from 'lucide-react';
 
 interface FileItem {

@@ -14,7 +14,6 @@ import {
   LogOut,
   Users,
   MessageSquare,
-  LayoutDashboard,
   FolderOpen,
 } from 'lucide-react';
 

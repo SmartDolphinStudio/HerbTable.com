@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Search, Eye, Edit, Trash2, Image as ImageIcon } from 'lucide-react';
 import type { Post } from '../types';
 
@@ -17,7 +17,7 @@ const mockPosts: Post[] = Array.from({ length: 15 }, (_, i) => ({
 }));
 
 export default function PostManagePage() {
-  const [posts, setPosts] = useState(mockPosts);
+  const [posts] = useState(mockPosts);
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState<'all' | 'published' | 'draft' | 'archived'>('all');
   const [previewImage, setPreviewImage] = useState<string | null>(null);

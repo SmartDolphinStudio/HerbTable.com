@@ -473,7 +473,6 @@ export function TerminalPage() {
   function rewriteLine(term: Terminal) {
     // 回到行首，清除当前行，重新写入
     const prefixLen = 'root@production-01:~$ '.length;
-    const totalLen = prefixLen + inputBufferRef.current.length;
     term.write(`\x1b[2K\x1b[${prefixLen + 1}G`);
     term.write(inputBufferRef.current);
     // 移动光标到正确位置

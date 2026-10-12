@@ -89,7 +89,7 @@ export function MetricCard({ data, activePopupId, onSetActivePopup }: MetricCard
             <h3 className="text-sm font-medium text-gray-500">{data.label}</h3>
             <p className="mt-1 text-lg font-semibold text-gray-900 truncate">{data.subtitle}</p>
           </div>
-          <RingProgress percentage={data.value} color={data.color} size={100} />
+          <RingProgress value={data.value} color={data.color} size={100} />
         </div>
       </div>
 
