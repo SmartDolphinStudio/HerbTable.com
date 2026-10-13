@@ -2,46 +2,38 @@
 
 ## Overview
 
-HerbTable consists of one browser application and three independently
-deployable native services. Nginx serves the built web assets and routes public
-API and captcha traffic to their Go services. The Rust security service is
-bound to loopback and is never exposed through Nginx.
+HerbTable consists of one browser application and two Go services. Nginx serves
+the built web assets and routes API and captcha traffic to those services.
 
 ## Components
 
 | Component | Location | Responsibility |
 | --- | --- | --- |
 | Public site | `web/public` | User-facing React application. |
-| Application API | `cmd/api-server` | HTTP API, MySQL access, Redis token blocklist, and orchestration. |
-| Security service | `server/security` | Argon2 password operations, JWT signing and verification, AES-256-GCM encryption. |
+| Application API | `cmd/api-server` | Health checks for the application API. |
 | Captcha service | `server/captcha` | Behavioral captcha verification and signed captcha tokens. |
 
 ## Service Communication
 
 ```text
-Browser -> Nginx -> Application API (:9002) -> MySQL / Redis
-                                    |
-                                    +-> Security service (127.0.0.1:9001)
+Browser -> Nginx -> Application API (:9002)
 Browser -> Nginx -> Captcha service (:3001)
 ```
 
-The security service accepts requests only from the local host. The application
-API supplies password and token requests to it over the loopback interface.
+The API currently exposes `GET /health` and `GET /api/v1/health`. Account and
+profile endpoints are not part of the current backend.
 
 ## Configuration
 
-`configs/default.env` is a variable-only template. Deployments must provide
-credentials and cryptographic material through an ignored local environment
-file or the host's secret-management mechanism. Required values are:
+`configs/default.env` is a variable-only template. The captcha service requires
+one signing secret from an ignored local environment file or host secret
+manager:
 
-- `MYSQL_DSN` for the application database connection.
-- `JWT_SECRET` for token signing and verification.
-- `AES_KEY`, a 32-byte key encoded as 64 hexadecimal characters.
-- `CAPTCHA_SECRET` for captcha token signing when the captcha service runs.
+- `CAPTCHA_SECRET`, at least 32 random bytes, for signing captcha tokens.
 
 ## Deployment
 
-Use the systemd unit templates and Nginx configuration in `deployments/` as
-the starting point for host deployment. Build artifacts are produced outside
-the repository and are intentionally not committed.
+Use the API and captcha systemd unit templates and Nginx configuration in
+`deployments/` as the starting point for host deployment. Build artifacts are
+produced outside the repository and are intentionally not committed.
 

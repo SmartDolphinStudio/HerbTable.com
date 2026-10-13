@@ -1,715 +1,75 @@
 package main
 
 import (
-	"context"
-	"crypto/hmac"
-	"crypto/rand"
-	"crypto/sha256"
-	"database/sql"
-	"encoding/hex"
 	"encoding/json"
-	"errors"
-	"fmt"
-	"io"
 	"log"
 	"net/http"
-	"net/mail"
-	"net/url"
 	"os"
-	"strings"
 	"time"
-
-	"github.com/go-sql-driver/mysql"
-	"github.com/redis/go-redis/v9"
 )
 
-const (
-	defaultListenAddr        = "127.0.0.1:9002"
-	defaultSecurityService   = "http://127.0.0.1:9001"
-	defaultRedisAddr         = "127.0.0.1:6379"
-	accessTokenExpirySeconds = 3600
-)
-
-type SecurityRequest struct {
-	Password string `json:"password,omitempty"`
-	Hash     string `json:"hash,omitempty"`
-	Sub      string `json:"sub,omitempty"`
-	Email    string `json:"email,omitempty"`
-	Role     string `json:"role,omitempty"`
-	Exp      int64  `json:"exp,omitempty"`
-	Token    string `json:"token,omitempty"`
-}
-
-type SecurityResponse struct {
-	Hash       string       `json:"hash,omitempty"`
-	Valid      bool         `json:"valid,omitempty"`
-	Token      string       `json:"token,omitempty"`
-	Claims     *TokenClaims `json:"claims,omitempty"`
-	Ciphertext string       `json:"ciphertext,omitempty"`
-	Plaintext  string       `json:"plaintext,omitempty"`
-	Error      string       `json:"error,omitempty"`
-}
-
-type TokenClaims struct {
-	Sub   string `json:"sub"`
-	Email string `json:"email"`
-	Role  string `json:"role"`
-	Exp   int64  `json:"exp"`
-}
-
-type User struct {
-	ID        string    `json:"id"`
-	Email     string    `json:"email"`
-	FullName  string    `json:"full_name"`
-	Role      string    `json:"role"`
-	Status    string    `json:"status"`
-	AvatarURL string    `json:"avatar_url"`
-	CreatedAt time.Time `json:"created_at"`
-}
-
-type RegisterRequest struct {
-	CaptchaToken string `json:"captcha_token"`
-	Email        string `json:"email"`
-	Password     string `json:"password"`
-	FullName     string `json:"full_name"`
-}
-
-type LoginRequest struct {
-	CaptchaToken string `json:"captcha_token"`
-	Email        string `json:"email"`
-	Password     string `json:"password"`
-}
-
-type VerifyEnterpriseRequest struct {
-	Email string `json:"email"`
-}
-
-type VerifyEnterpriseResponse struct {
-	IsEnterprise bool   `json:"is_enterprise"`
-	Email        string `json:"email"`
-	Provider     string `json:"provider,omitempty"`
-	Error        string `json:"error,omitempty"`
-}
-
-type AuthResponse struct {
-	AccessToken string `json:"access_token"`
-	TokenType   string `json:"token_type"`
-	ExpiresIn   int64  `json:"expires_in"`
-	User        User   `json:"user"`
-}
-
-type Server struct {
-	db             *sql.DB
-	redis          *redis.Client
-	security       string
-	emailLookupKey string
-	serviceKey     string
-	captchaURL     string
-	captchaKey     string
-	httpClient     *http.Client
-}
-
-// emailVerifierResult holds the common fields returned by the 3 verifier APIs.
-type emailVerifierResult struct {
-	IsFree       bool `json:"is_free"`
-	HasMX        bool `json:"has_mx"`
-	IsDisposable bool `json:"is_disposable"`
-}
+const defaultListenAddr = "127.0.0.1:9002"
 
 func main() {
-	listenAddr := getEnv("API_LISTEN_ADDR", defaultListenAddr)
-	securityService := getEnv("SECURITY_SERVICE_URL", defaultSecurityService)
-	mysqlDSN := os.Getenv("MYSQL_DSN")
-	if mysqlDSN == "" {
-		log.Fatal("MYSQL_DSN must be set")
-	}
-	redisAddr := getEnv("REDIS_ADDR", defaultRedisAddr)
-	redisPassword := os.Getenv("REDIS_PASSWORD")
-
-	db, err := sql.Open("mysql", mysqlDSN)
-	if err != nil {
-		log.Fatalf("failed to open mysql: %v", err)
-	}
-	db.SetMaxOpenConns(25)
-	db.SetMaxIdleConns(5)
-	db.SetConnMaxLifetime(5 * time.Minute)
-	if err := db.Ping(); err != nil {
-		log.Fatalf("failed to ping mysql: %v", err)
-	}
-	if err := migrate(db); err != nil {
-		log.Fatalf("failed to migrate: %v", err)
-	}
-
-	rdb := redis.NewClient(&redis.Options{
-		Addr:     redisAddr,
-		Password: redisPassword,
-		DB:       0,
-	})
-	if err := rdb.Ping(context.Background()).Err(); err != nil {
-		log.Fatalf("failed to ping redis: %v", err)
-	}
-
-	emailLookupKey := os.Getenv("EMAIL_LOOKUP_SECRET")
-	if len(emailLookupKey) < 32 {
-		log.Fatal("EMAIL_LOOKUP_SECRET requires at least 32 random bytes")
-	}
-	serviceKey := os.Getenv("SECURITY_SERVICE_KEY")
-	captchaKey := os.Getenv("CAPTCHA_SERVICE_KEY")
-	if len(serviceKey) < 32 || len(captchaKey) < 32 {
-		log.Fatal("internal service keys require at least 32 random bytes")
-	}
-	server := &Server{
-		emailLookupKey: emailLookupKey, serviceKey: serviceKey, captchaURL: getEnv("CAPTCHA_SERVICE_URL", "http://127.0.0.1:3001"), captchaKey: captchaKey,
-		db:         db,
-		redis:      rdb,
-		security:   securityService,
-		httpClient: &http.Client{Timeout: 5 * time.Second},
-	}
-
-	if err := server.migratePrivateEmails(context.Background()); err != nil {
-		log.Fatalf("email privacy migration failed: %v", err)
-	}
 	mux := http.NewServeMux()
-	mux.HandleFunc("/api/v1/auth/register", server.handleRegister)
-	mux.HandleFunc("/api/v1/auth/login", server.handleLogin)
-	mux.HandleFunc("/api/v1/auth/verify-enterprise-email", server.handleVerifyEnterpriseEmail)
-	mux.HandleFunc("/api/v1/auth/logout", server.handleLogout)
-	mux.HandleFunc("/api/v1/me", server.handleMe)
-	mux.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {
-		respondJSON(w, http.StatusOK, map[string]string{"status": "ok"})
-	})
+	mux.HandleFunc("/health", handleHealth)
+	mux.HandleFunc("/api/v1/health", handleHealth)
 
-	handler := withCORS(withLimits(mux))
-
-	log.Printf("HerbTable API server listening on %s", listenAddr)
-	httpServer := &http.Server{Addr: listenAddr, Handler: handler, ReadHeaderTimeout: 5 * time.Second, ReadTimeout: 10 * time.Second, WriteTimeout: 20 * time.Second, IdleTimeout: 30 * time.Second, MaxHeaderBytes: 16 << 10}
-	if err := httpServer.ListenAndServe(); err != nil {
-		log.Fatalf("server error: %v", err)
+	server := &http.Server{
+		Addr:              getEnv("API_LISTEN_ADDR", defaultListenAddr),
+		Handler:           withCORS(mux),
+		ReadHeaderTimeout: 5 * time.Second,
+		ReadTimeout:       10 * time.Second,
+		WriteTimeout:      10 * time.Second,
+		IdleTimeout:       30 * time.Second,
+		MaxHeaderBytes:    16 << 10,
 	}
+	log.Printf("HerbTable API listening on %s", server.Addr)
+	log.Fatal(server.ListenAndServe())
+}
+
+func handleHealth(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		w.Header().Set("Allow", http.MethodGet)
+		writeJSON(w, http.StatusMethodNotAllowed, map[string]string{"error": "method not allowed"})
+		return
+	}
+	writeJSON(w, http.StatusOK, map[string]string{"service": "herbtable-api", "status": "ok"})
 }
 
 func getEnv(key, fallback string) string {
-	if v := os.Getenv(key); v != "" {
-		return v
+	if value := os.Getenv(key); value != "" {
+		return value
 	}
 	return fallback
 }
 
-func migrate(db *sql.DB) error {
-	schema := `
-CREATE TABLE IF NOT EXISTS users (
-    id VARCHAR(36) PRIMARY KEY,
-    email VARCHAR(255) NOT NULL UNIQUE,
-    email_encrypted TEXT NOT NULL,
-    full_name VARCHAR(255) NOT NULL,
-    password_hash TEXT NOT NULL,
-    role VARCHAR(32) NOT NULL DEFAULT 'creator',
-    status VARCHAR(32) NOT NULL DEFAULT 'active',
-    avatar_url VARCHAR(512) NOT NULL DEFAULT '/Image.png',
-    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-`
-	_, err := db.Exec(schema)
-	return err
-}
-
-func (s *Server) handleRegister(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodPost {
-		respondError(w, http.StatusMethodNotAllowed, "method not allowed")
-		return
-	}
-	var req RegisterRequest
-	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		respondError(w, http.StatusBadRequest, "invalid request body")
-		return
-	}
-	if req.Email == "" || req.Password == "" || len(req.Password) > 1024 {
-		respondError(w, http.StatusBadRequest, "email and password are required")
-		return
-	}
-
-	email, err := normalizeEmail(req.Email)
-	if err != nil {
-		respondError(w, 400, "invalid email")
-		return
-	}
-	req.Email = email
-	if !s.consumeCaptcha(r, req.CaptchaToken) {
-		respondError(w, 403, "captcha required or already consumed")
-		return
-	}
-	var existing string
-	err = s.db.QueryRowContext(r.Context(), "SELECT id FROM users WHERE email = ?", s.emailLookup(req.Email)).Scan(&existing)
-	if err == nil {
-		respondError(w, http.StatusConflict, "email already registered")
-		return
-	}
-	if err != sql.ErrNoRows {
-		respondError(w, http.StatusInternalServerError, "database error")
-		return
-	}
-
-	hashResp, err := s.callSecurity("/v1/hash", SecurityRequest{Password: req.Password})
-	if err != nil || hashResp.Hash == "" {
-		respondError(w, http.StatusInternalServerError, "failed to hash password")
-		return
-	}
-
-	encryptResp, err := s.callSecurity("/v1/encrypt", map[string]string{"plaintext": req.Email})
-	if err != nil || encryptResp.Ciphertext == "" {
-		respondError(w, http.StatusInternalServerError, "failed to encrypt email")
-		return
-	}
-
-	userID := generateID()
-	token, expiresIn, err := s.createToken(userID, req.Email, "creator")
-	if err != nil {
-		respondError(w, http.StatusInternalServerError, "failed to create token")
-		return
-	}
-
-	_, err = s.db.ExecContext(r.Context(),
-		"INSERT INTO users (id, email, email_encrypted, full_name, password_hash, role, status, avatar_url) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
-		userID, s.emailLookup(req.Email), encryptResp.Ciphertext, req.FullName, hashResp.Hash, "creator", "active", "/Image.png",
-	)
-	if err != nil {
-		var mysqlErr *mysql.MySQLError
-		if errors.As(err, &mysqlErr) && mysqlErr.Number == 1062 {
-			respondError(w, http.StatusConflict, "email already registered")
-			return
-		}
-		respondError(w, http.StatusInternalServerError, "failed to create user")
-		return
-	}
-
-	respondJSON(w, http.StatusCreated, AuthResponse{
-		AccessToken: token,
-		TokenType:   "Bearer",
-		ExpiresIn:   expiresIn,
-		User: User{
-			ID:        userID,
-			Email:     req.Email,
-			FullName:  req.FullName,
-			Role:      "creator",
-			Status:    "active",
-			AvatarURL: "/Image.png",
-		},
-	})
-}
-
-func (s *Server) handleLogin(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodPost {
-		respondError(w, http.StatusMethodNotAllowed, "method not allowed")
-		return
-	}
-	var req LoginRequest
-	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		respondError(w, http.StatusBadRequest, "invalid request body")
-		return
-	}
-	if req.Email == "" || req.Password == "" || len(req.Password) > 1024 {
-		respondError(w, http.StatusBadRequest, "email and password are required")
-		return
-	}
-
-	email, err := normalizeEmail(req.Email)
-	if err != nil {
-		respondError(w, 400, "invalid email")
-		return
-	}
-	req.Email = email
-	if !s.consumeCaptcha(r, req.CaptchaToken) {
-		respondError(w, 403, "captcha required or already consumed")
-		return
-	}
-	var user User
-	var passwordHash string
-	err = s.db.QueryRowContext(r.Context(), "SELECT id, email, full_name, password_hash, role, status, avatar_url, created_at FROM users WHERE email = ?", s.emailLookup(req.Email)).Scan(
-		&user.ID, &user.Email, &user.FullName, &passwordHash, &user.Role, &user.Status, &user.AvatarURL, &user.CreatedAt,
-	)
-	if err == sql.ErrNoRows {
-		respondError(w, http.StatusUnauthorized, "invalid credentials")
-		return
-	}
-	if err != nil {
-		respondError(w, http.StatusInternalServerError, "database error")
-		return
-	}
-
-	if user.Status != "active" {
-		respondError(w, 403, "account inactive")
-		return
-	}
-	user.Email = req.Email // Lookup matched the normalized submitted address.
-	verifyResp, err := s.callSecurity("/v1/verify", SecurityRequest{Password: req.Password, Hash: passwordHash})
-	if err != nil || !verifyResp.Valid {
-		respondError(w, http.StatusUnauthorized, "invalid credentials")
-		return
-	}
-
-	if verifyResp.Hash != "" {
-		if _, err = s.db.ExecContext(r.Context(), "UPDATE users SET password_hash = ? WHERE id = ? AND password_hash = ?", verifyResp.Hash, user.ID, passwordHash); err != nil {
-			respondError(w, 503, "password upgrade unavailable")
-			return
-		}
-	}
-	token, expiresIn, err := s.createToken(user.ID, user.Email, user.Role)
-	if err != nil {
-		respondError(w, http.StatusInternalServerError, "failed to create token")
-		return
-	}
-
-	respondJSON(w, http.StatusOK, AuthResponse{
-		AccessToken: token,
-		TokenType:   "Bearer",
-		ExpiresIn:   expiresIn,
-		User:        user,
-	})
-}
-
-func (s *Server) handleVerifyEnterpriseEmail(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodPost {
-		respondError(w, http.StatusMethodNotAllowed, "method not allowed")
-		return
-	}
-	var req VerifyEnterpriseRequest
-	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		respondError(w, http.StatusBadRequest, "invalid request body")
-		return
-	}
-	if req.Email == "" || !strings.Contains(req.Email, "@") {
-		respondError(w, http.StatusBadRequest, "valid email is required")
-		return
-	}
-
-	if os.Getenv("ALLOW_THIRD_PARTY_EMAIL_LOOKUP") != "true" {
-		respondError(w, 503, "third-party email lookup disabled; address ownership requires email verification")
-		return
-	}
-	normalized, err := normalizeEmail(req.Email)
-	if err != nil {
-		respondError(w, 400, "invalid email")
-		return
-	}
-	req.Email = normalized
-	providers := []struct {
-		name string
-		url  string
-	}{
-		{
-			name: "rapid-email-verifier",
-			url:  "https://rapid-email-verifier.fly.dev/api/validate?email=" + url.QueryEscape(req.Email),
-		},
-		{
-			name: "free-email-validation-api",
-			url:  "https://freeemailvalidationapi.deta.dev/validate-email?email=" + url.QueryEscape(req.Email),
-		},
-		{
-			name: "email-verify-vercel",
-			url:  "https://email-verify-seven.vercel.app/verify?email=" + url.QueryEscape(req.Email),
-		},
-	}
-
-	var lastErr string
-	for _, p := range providers {
-		res, err := s.httpClient.Get(p.url)
-		if err != nil {
-			lastErr = err.Error()
-			continue
-		}
-		body := res.Body
-		if res.StatusCode != http.StatusOK {
-			body.Close()
-			lastErr = fmt.Sprintf("%s returned %d", p.name, res.StatusCode)
-			continue
-		}
-		var result emailVerifierResult
-		if err := json.NewDecoder(io.LimitReader(body, 64<<10)).Decode(&result); err != nil {
-			body.Close()
-			lastErr = err.Error()
-			continue
-		}
-		body.Close()
-
-		isEnterprise := !result.IsFree && result.HasMX && !result.IsDisposable
-		respondJSON(w, http.StatusOK, VerifyEnterpriseResponse{
-			IsEnterprise: isEnterprise,
-			Email:        req.Email,
-			Provider:     p.name,
-		})
-		return
-	}
-
-	respondError(w, http.StatusServiceUnavailable, "Verification service temporarily unavailable. Please try again later. Last error: "+lastErr)
-}
-
-func (s *Server) handleLogout(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodPost {
-		respondError(w, http.StatusMethodNotAllowed, "method not allowed")
-		return
-	}
-	token := extractBearer(r)
-	if token == "" {
-		respondError(w, http.StatusUnauthorized, "missing token")
-		return
-	}
-	verifyResp, err := s.callSecurity("/v1/token/verify", SecurityRequest{Token: token})
-	if err != nil || !verifyResp.Valid || verifyResp.Claims == nil {
-		respondError(w, http.StatusUnauthorized, "invalid token")
-		return
-	}
-	remaining := verifyResp.Claims.Exp - time.Now().Unix()
-	if remaining > 0 {
-		if err := s.redis.Set(r.Context(), "blocklist:"+token, "1", time.Duration(remaining)*time.Second).Err(); err != nil {
-			respondError(w, 503, "revocation unavailable")
-			return
-		}
-	}
-	respondJSON(w, http.StatusOK, map[string]string{"status": "ok"})
-}
-
-func (s *Server) handleMe(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodGet {
-		respondError(w, http.StatusMethodNotAllowed, "method not allowed")
-		return
-	}
-	token := extractBearer(r)
-	if token == "" {
-		respondError(w, http.StatusUnauthorized, "missing token")
-		return
-	}
-	blocked, err := s.redis.Exists(r.Context(), "blocklist:"+token).Result()
-	if err != nil {
-		respondError(w, 503, "session verification unavailable")
-		return
-	}
-	if blocked > 0 {
-		respondError(w, http.StatusUnauthorized, "token revoked")
-		return
-	}
-	verifyResp, err := s.callSecurity("/v1/token/verify", SecurityRequest{Token: token})
-	if err != nil || !verifyResp.Valid || verifyResp.Claims == nil {
-		respondError(w, http.StatusUnauthorized, "invalid token")
-		return
-	}
-
-	var user User
-	var encryptedEmail string
-	err = s.db.QueryRowContext(r.Context(), "SELECT id, email_encrypted, full_name, role, status, avatar_url, created_at FROM users WHERE id = ?", verifyResp.Claims.Sub).Scan(
-		&user.ID, &encryptedEmail, &user.FullName, &user.Role, &user.Status, &user.AvatarURL, &user.CreatedAt,
-	)
-	if err == sql.ErrNoRows {
-		respondError(w, http.StatusNotFound, "user not found")
-		return
-	}
-	if err != nil {
-		respondError(w, http.StatusInternalServerError, "database error")
-		return
-	}
-	if user.Status != "active" {
-		respondError(w, 403, "account inactive")
-		return
-	}
-	decoded, e := s.callSecurity("/v1/decrypt", map[string]string{"ciphertext": encryptedEmail})
-	if e != nil {
-		respondError(w, 503, "profile unavailable")
-		return
-	}
-	user.Email = decoded.Plaintext
-	respondJSON(w, http.StatusOK, user)
-}
-
-func (s *Server) createToken(userID, email, role string) (string, int64, error) {
-	expiresIn := int64(accessTokenExpirySeconds)
-	exp := time.Now().Unix() + expiresIn
-	signResp, err := s.callSecurity("/v1/token/sign", SecurityRequest{
-		Sub:   userID,
-		Email: email,
-		Role:  role,
-		Exp:   exp,
-	})
-	if err != nil {
-		return "", 0, err
-	}
-	return signResp.Token, expiresIn, nil
-}
-
-func (s *Server) callSecurity(endpoint string, payload interface{}) (*SecurityResponse, error) {
-	body, err := json.Marshal(payload)
-	if err != nil {
-		return nil, err
-	}
-	url := s.security + endpoint
-	req, err := http.NewRequest(http.MethodPost, url, strings.NewReader(string(body)))
-	if err != nil {
-		return nil, err
-	}
-	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("X-Internal-Key", s.serviceKey)
-	resp, err := s.httpClient.Do(req)
-	if err != nil {
-		return nil, err
-	}
-	defer resp.Body.Close()
-
-	if resp.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("security service status %d", resp.StatusCode)
-	}
-	var result SecurityResponse
-	if err := json.NewDecoder(io.LimitReader(resp.Body, 64<<10)).Decode(&result); err != nil {
-		return nil, err
-	}
-	return &result, nil
+func writeJSON(w http.ResponseWriter, status int, value any) {
+	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Cache-Control", "no-store")
+	w.WriteHeader(status)
+	_ = json.NewEncoder(w).Encode(value)
 }
 
 func withCORS(next http.Handler) http.Handler {
+	allowedOrigins := map[string]bool{
+		"http://herbtable.com":  true,
+		"https://herbtable.com": true,
+		"http://localhost:5173": true,
+		"http://localhost:4173": true,
+	}
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		origin := r.Header.Get("Origin")
-		allowed := []string{"http://herbtable.com", "https://herbtable.com", "http://localhost:5173", "http://localhost:4173"}
-		for _, o := range allowed {
-			if origin == o {
-				w.Header().Set("Access-Control-Allow-Origin", origin)
-				break
-			}
+		if allowedOrigins[origin] {
+			w.Header().Set("Access-Control-Allow-Origin", origin)
+			w.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
+			w.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS")
+			w.Header().Add("Vary", "Origin")
 		}
-		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
-		w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
-		w.Header().Set("Access-Control-Allow-Credentials", "true")
 		if r.Method == http.MethodOptions {
 			w.WriteHeader(http.StatusNoContent)
 			return
 		}
 		next.ServeHTTP(w, r)
 	})
-}
-
-func extractBearer(r *http.Request) string {
-	auth := r.Header.Get("Authorization")
-	if auth == "" {
-		return ""
-	}
-	parts := strings.SplitN(auth, " ", 2)
-	if len(parts) != 2 || !strings.EqualFold(parts[0], "Bearer") {
-		return ""
-	}
-	return parts[1]
-}
-
-func respondJSON(w http.ResponseWriter, status int, payload interface{}) {
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(status)
-	json.NewEncoder(w).Encode(payload)
-}
-
-func respondError(w http.ResponseWriter, status int, message string) {
-	respondJSON(w, status, map[string]string{"error": message})
-}
-
-func generateID() string {
-	b := make([]byte, 16)
-	if _, err := rand.Read(b); err != nil {
-		panic("secure random unavailable")
-	}
-	return hex.EncodeToString(b)
-}
-
-func normalizeEmail(input string) (string, error) {
-	input = strings.TrimSpace(input)
-	a, e := mail.ParseAddress(input)
-	if e != nil || a.Address != input || len(input) > 255 {
-		return "", fmt.Errorf("invalid email")
-	}
-	return strings.ToLower(a.Address), nil
-}
-func withLimits(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		r.Body = http.MaxBytesReader(w, r.Body, 64<<10)
-		ctx, cancel := context.WithTimeout(r.Context(), 15*time.Second)
-		defer cancel()
-		next.ServeHTTP(w, r.WithContext(ctx))
-	})
-}
-func (s *Server) consumeCaptcha(r *http.Request, token string) bool {
-	c, e := r.Cookie("herb_captcha_session")
-	if e != nil || token == "" || len(token) > 2048 {
-		return false
-	}
-	body, _ := json.Marshal(map[string]string{"token": token, "purpose": "auth", "session": c.Value})
-	req, e := http.NewRequestWithContext(r.Context(), "POST", s.captchaURL+"/internal/consume", strings.NewReader(string(body)))
-	if e != nil {
-		return false
-	}
-	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("X-Internal-Key", s.captchaKey)
-	resp, e := s.httpClient.Do(req)
-	if e != nil {
-		return false
-	}
-	defer resp.Body.Close()
-	var result struct {
-		Valid bool `json:"valid"`
-	}
-	return resp.StatusCode == 200 && json.NewDecoder(io.LimitReader(resp.Body, 4096)).Decode(&result) == nil && result.Valid
-}
-
-// A keyed deterministic lookup replaces plaintext email in the unique index.
-// Keep this key stable; rotation needs an explicit migration from encrypted_email.
-func (s *Server) emailLookup(email string) string {
-	mac := hmac.New(sha256.New, []byte(s.emailLookupKey))
-	mac.Write([]byte(email))
-	return "lookup:v1:" + hex.EncodeToString(mac.Sum(nil))
-}
-func (s *Server) migratePrivateEmails(ctx context.Context) error {
-	for {
-		rows, err := s.db.QueryContext(ctx, "SELECT id,email FROM users WHERE email NOT LIKE 'lookup:v1:%' LIMIT 500")
-		if err != nil {
-			return err
-		}
-		type legacy struct{ id, email string }
-		var batch []legacy
-		for rows.Next() {
-			var v legacy
-			if err := rows.Scan(&v.id, &v.email); err != nil {
-				rows.Close()
-				return err
-			}
-			batch = append(batch, v)
-		}
-		err = rows.Err()
-		rows.Close()
-		if err != nil {
-			return err
-		}
-		if len(batch) == 0 {
-			return nil
-		}
-		type update struct{ id, old, lookup, cipher string }
-		var updates []update
-		for _, v := range batch {
-			email, e := normalizeEmail(v.email)
-			if e != nil {
-				return fmt.Errorf("invalid legacy email on account %s", v.id)
-			}
-			encrypted, e := s.callSecurity("/v1/encrypt", map[string]string{"plaintext": email})
-			if e != nil || encrypted.Ciphertext == "" {
-				return fmt.Errorf("email encryption unavailable")
-			}
-			updates = append(updates, update{v.id, v.email, s.emailLookup(email), encrypted.Ciphertext})
-		}
-		tx, e := s.db.BeginTx(ctx, nil)
-		if e != nil {
-			return e
-		}
-		for _, u := range updates {
-			_, e = tx.ExecContext(ctx, "UPDATE users SET email=?,email_encrypted=? WHERE id=? AND email=?", u.lookup, u.cipher, u.id, u.old)
-			if e != nil {
-				tx.Rollback()
-				return e
-			}
-		}
-		if e = tx.Commit(); e != nil {
-			return e
-		}
-	}
 }

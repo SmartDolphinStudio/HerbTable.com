@@ -1,8 +1,6 @@
 node_modules/
-target/
 dist/
 .cache/
-*.db
 .env
 .env.*
 !*.env.example

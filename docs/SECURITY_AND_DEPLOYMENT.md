@@ -1,13 +1,15 @@
-# Security and deployment contract
+# Security and deployment
 
-Go services use Go 1.26.5; Rust uses the committed toolchain/lockfile. Run Rust security first at 127.0.0.1:9001, captcha at 127.0.0.1:3001, API at 127.0.0.1:9002. Nginx preserves `/api/...`. Put each service's variables in its systemd EnvironmentFile; port variables are independent. Never expose the internal services directly.
+The Go API exposes only `GET /health` and `GET /api/v1/health`. It has no
+account, persistence, or token-signing endpoints. The public login and
+registration screens currently use client-side demo state.
 
-Generate each of JWT_SECRET, SECURITY_SERVICE_KEY, CAPTCHA_SECRET, CAPTCHA_SERVICE_KEY and EMAIL_LOOKUP_SECRET independently (`openssl rand -hex 32`). JWT rejects short or repeated-byte keys. AES_KEY is 64 hex characters. The API and respective service must share internal keys. Keep AES_KEY and EMAIL_LOOKUP_SECRET stable and back them up securely; rotation requires an explicit data migration. Templates intentionally contain no usable secrets.
+The Go captcha service handles `/api/captcha/challenge` and
+`/api/captcha/verify`. It keeps short-lived challenge state in memory, so run a
+single instance unless shared storage is added. Set `CAPTCHA_SECRET` to at
+least 32 random bytes. The captcha is a behavioral heuristic, not proof of
+identity or authorization.
 
-The API automatically replaces legacy plaintext email index values in bounded batches with keyed HMAC lookup values and encrypted email, using transactions. Start with an operator-controlled backup and Rust service available. Invalid legacy email or case-folding duplicates cause the migration to stop; resolve those records before retrying. Historical backups and database logs may contain old plaintext and must expire under the operator's retention policy. A database-only leak reveals account metadata and deterministic equality of email hashes, but not plaintext email. The application/key compromise can still decrypt it; responses reveal the authenticated user's own email.
-
-Password hashes use standard Argon2 PHC strings. Valid legacy salt/hash pairs are upgraded during login; malformed parameters and excess sizes are rejected. CPU work runs in a bounded blocking pool. JWTs expire within an hour; Redis revocation errors fail closed. Account status is checked on login and `/me`.
-
-Before register/login, GET `/api/captcha/challenge` with same-origin cookies; collect the demo interaction signals for at least one second, POST `/api/captcha/verify` including challenge. Send the returned `captcha_token` to the auth endpoint with the same session cookie. The API consumes it once over the authenticated internal endpoint. Proofs are session/purpose bound and expire in two minutes. This behavioral heuristic does not prove a human or identity. In-memory proof state supports one captcha process; restarts invalidate outstanding proofs. Multiple instances require shared atomic storage before deployment. With TLS termination set the session cookie's Secure policy explicitly at the trusted edge. Do not use these examples as production anti-bot guarantees.
-
-Third-party email verification is disabled unless ALLOW_THIRD_PARTY_EMAIL_LOOKUP=true. Enabling it sends the supplied address to external services and requires product consent. The React public/admin sites are visible demos, and are not connected production authentication or administrative authorization. Configure real authorization before any deployment with real data.
+Nginx serves the public site and proxies `/api/captcha/` to the captcha service
+and other `/api/` paths to the Go API. The systemd unit templates live in
+`deployments/`; keep the captcha secret in the host's environment file.

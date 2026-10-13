@@ -5,7 +5,6 @@ import (
 	"crypto/hmac"
 	"crypto/rand"
 	"crypto/sha256"
-	"crypto/subtle"
 	"encoding/hex"
 	"encoding/json"
 	"log"
@@ -40,10 +39,9 @@ type challenge struct {
 	Attempts int
 }
 
-var secretKey, serviceKey string
+var secretKey string
 var mu sync.Mutex
 var challenges = map[string]challenge{}
-var proofs = map[string]tokenClaims{}
 
 type rateEntry struct {
 	Start time.Time
@@ -107,11 +105,6 @@ func sweep(now time.Time) {
 	for k, v := range challenges {
 		if now.Sub(v.Created) > 5*time.Minute {
 			delete(challenges, k)
-		}
-	}
-	for k, v := range proofs {
-		if v.Exp <= now.Unix() {
-			delete(proofs, k)
 		}
 	}
 }
@@ -178,21 +171,7 @@ func parseToken(token string) (tokenClaims, bool) {
 	if !hmac.Equal(mac.Sum(nil), signature) || json.Unmarshal(payload, &c) != nil {
 		return c, false
 	}
-	return c, c.ID != "" && c.Purpose == "auth" && c.Exp > time.Now().Unix() && c.Exp <= time.Now().Add(5*time.Minute).Unix()
-}
-func consumeToken(token, purpose, sid string) bool {
-	c, ok := parseToken(token)
-	if !ok || purpose != c.Purpose || sid == "" || sid != c.Session {
-		return false
-	}
-	mu.Lock()
-	defer mu.Unlock()
-	saved, ok := proofs[c.ID]
-	if !ok || saved != c {
-		return false
-	}
-	delete(proofs, c.ID)
-	return true
+	return c, c.ID != "" && c.Purpose == "captcha" && c.Exp > time.Now().Unix() && c.Exp <= time.Now().Add(5*time.Minute).Unix()
 }
 func handleCaptchaVerify(w http.ResponseWriter, r *http.Request) {
 	if r.Method != "POST" {
@@ -228,49 +207,24 @@ func handleCaptchaVerify(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	delete(challenges, req.Challenge)
-	if len(proofs) >= 10000 {
-		mu.Unlock()
-		response(w, 503, map[string]any{"success": false, "error": "proof capacity"})
-		return
-	}
 	id, e := randomID()
 	if e != nil {
 		mu.Unlock()
 		response(w, 503, map[string]any{"success": false})
 		return
 	}
-	claims := tokenClaims{ID: id, Exp: now.Add(2 * time.Minute).Unix(), Purpose: "auth", Session: sid}
-	proofs[id] = claims
+	claims := tokenClaims{ID: id, Exp: now.Add(2 * time.Minute).Unix(), Purpose: "captcha", Session: sid}
 	mu.Unlock()
 	response(w, 200, map[string]any{"success": true, "token": signClaims(claims)})
 }
-func handleConsume(w http.ResponseWriter, r *http.Request) {
-	if r.Method != "POST" || subtle.ConstantTimeCompare([]byte(r.Header.Get("X-Internal-Key")), []byte(serviceKey)) != 1 {
-		response(w, 403, map[string]any{"valid": false})
-		return
-	}
-	var req struct {
-		Token   string `json:"token"`
-		Purpose string `json:"purpose"`
-		Session string `json:"session"`
-	}
-	r.Body = http.MaxBytesReader(w, r.Body, 4096)
-	if json.NewDecoder(r.Body).Decode(&req) != nil {
-		response(w, 400, map[string]any{"valid": false})
-		return
-	}
-	response(w, 200, map[string]any{"valid": consumeToken(req.Token, req.Purpose, req.Session)})
-}
 func main() {
 	secretKey = os.Getenv("CAPTCHA_SECRET")
-	serviceKey = os.Getenv("CAPTCHA_SERVICE_KEY")
-	if len(secretKey) < 32 || len(serviceKey) < 32 {
-		log.Fatal("CAPTCHA_SECRET and CAPTCHA_SERVICE_KEY require at least 32 random bytes")
+	if len(secretKey) < 32 {
+		log.Fatal("CAPTCHA_SECRET requires at least 32 random bytes")
 	}
 	mux := http.NewServeMux()
 	mux.HandleFunc("/api/captcha/challenge", handleChallenge)
 	mux.HandleFunc("/api/captcha/verify", handleCaptchaVerify)
-	mux.HandleFunc("/internal/consume", handleConsume)
 	server := &http.Server{Addr: getEnv("CAPTCHA_LISTEN_ADDR", "127.0.0.1:3001"), Handler: mux, ReadHeaderTimeout: 5 * time.Second, ReadTimeout: 10 * time.Second, WriteTimeout: 10 * time.Second, IdleTimeout: 30 * time.Second, MaxHeaderBytes: 16 << 10}
 	log.Fatal(server.ListenAndServe())
 }
