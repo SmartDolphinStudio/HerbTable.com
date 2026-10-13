@@ -1,19 +1,17 @@
 # HerbTable
 
-HerbTable is a creative curation platform with a public web experience, an
-administration console, and small native services for application and security
-workloads.
+HerbTable is a creative curation platform with a public web experience and
+native services for application and security workloads.
 
 ## Status
 
-This repository is under active development. The web applications currently use
-local presentation data in several views; production integrations should be
-implemented against the documented API before release.
+This repository is under active development. The public web application
+currently uses local presentation data in several views; production integrations
+should be implemented against the documented API before release.
 
 ## Architecture
 
 - **Public site**: React, TypeScript, Vite, and Tailwind CSS.
-- **Admin console**: React, TypeScript, Vite, and Tailwind CSS.
 - **Application API**: Go HTTP service backed by MySQL and Redis.
 - **Security service**: Rust/Axum service for password hashing, token handling,
   and authenticated encryption.
@@ -30,7 +28,6 @@ cmd/api-server/        Go application API entry point
 server/security/       Rust security service
 server/captcha/        Go captcha service
 web/public/            Public React application
-web/admin/             Administration React application
 configs/               Safe configuration templates
 deployments/           Nginx and systemd deployment manifests
 docs/                  Technical documentation
@@ -38,8 +35,8 @@ docs/                  Technical documentation
 
 ## Prerequisites
 
-- Node.js 20 or later
-- Go 1.26.5
+- Node.js 24 or later
+- Go 1.26.0 or later
 - Rust stable toolchain
 - MySQL and Redis for the application API
 
@@ -52,16 +49,10 @@ docs/                  Technical documentation
 3. Export the values from your local configuration file in the shell that runs
    the services.
 
-Run the frontend applications in separate terminals:
+Run the public frontend:
 
 ```sh
 cd web/public
-npm ci
-npm run dev
-```
-
-```sh
-cd web/admin
 npm ci
 npm run dev
 ```
@@ -81,7 +72,6 @@ to `127.0.0.1:9001` by default, and the captcha service listens on `:3001`.
 
 ```sh
 (cd web/public && npm run build)
-(cd web/admin && npm run build)
 (cd cmd/api-server && go test ./...)
 cargo check --manifest-path server/security/Cargo.toml
 (cd server/captcha && go test ./...)
